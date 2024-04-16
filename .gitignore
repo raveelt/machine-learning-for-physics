@@ -1,4 +1,6 @@
 
 *.jpg
+*.pdf
 /Midterm
 /solutions
+/labs/lab22
