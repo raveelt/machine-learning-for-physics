@@ -1,0 +1,3 @@
+\contentsline {table}{\numberline {1}{\ignorespaces Results of the Secquential Feature Selector. We can gather Feature Importances from these tables. The ones highlighed in green is what we use to continue our analysis\relax }}{10}{}%
+\contentsline {table}{\numberline {2}{\ignorespaces Parameters we will swift through in gridsearchCV.\relax }}{11}{}%
+\contentsline {table}{\numberline {3}{\ignorespaces Best Parameters for the 3 Feature Lists.\relax }}{11}{}%
