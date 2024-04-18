@@ -30,6 +30,11 @@
 
 \title{Neural Network Classification of Top Quark Production at the Large Hadron Collider }
 \author{Raveel Tejani}
+\date{\parbox{\linewidth}{\centering%
+		\today\endgraf\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip
+		\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip
+		PHYS 310 \endgraf\bigskip
+		University of British Columbia}}
 
 
 
@@ -67,26 +72,21 @@ To accomplish these goals, simulated data samples of ttZ and WZ events, produced
 \clearpage
 \section{Methods}
 
-Describe briefly the ML algorithms that will be used in the project
+The initial phase of the project involved utilizing a predefined neural network (NN) model, constructed using Keras's Sequential API, for the classification of ttZ and WZ events. The base model was configured to operate with a subset of features, specifically 9 out of a possible 18 features, selected based on prior analyses which identified them as significant. 
+We will perform the following steps to hopefully enhance the model's performance:
 
-We will mainly be using a Neural Network for classification.
-
-
-We are given a base model with recommended feature selection.
-
-For the context
 \begin{figure}[ht]
 
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[height=.5\linewidth]{base_model/base_loss.pdf}
+		\includegraphics[height=.45\linewidth]{base_model/base_loss.pdf}
 		\caption{Loss reduction as a function of epochs}
 	\end{subfigure}%
 	\vspace{0.2cm} % Adds space between the rows
 	
 	\begin{subfigure}{\textwidth}
 	\centering
-		\includegraphics[height=.5\linewidth]{base_model/base_accuracy.pdf}
+		\includegraphics[height=.45\linewidth]{base_model/base_accuracy.pdf}
 		\caption{Accuracy performance as a function of epochs}
 	
 	\end{subfigure}
@@ -94,51 +94,69 @@ For the context
 	
 	\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[height=.5\linewidth]{base_model/base_NNout.pdf}
+		\includegraphics[height=.45\linewidth]{base_model/base_NNout.pdf}
 		\caption{Probability distribution of test and train cases, based on trained Neural network}
 	\end{subfigure}
 	
-	\caption{The base Neural Netwoek model provided  with  model.}
+	\caption{Perfromance of The Base Neural Network Model Using Base Feature Selection. (a) Loss curves for the training and validation datasets, demonstrating model convergence. (b) Accuracy scores for the training and validation datasets, reflecting model effectiveness. (c) NN output distributions for both training and testing datasets, highlighting the model's differentiation between signal and background classes.}
 	\label{fig:base_model_plots}
 \end{figure}
 
 
-First we will start by using SRS for feature selection. Perform Base model on all features.
+\begin{enumerate}
+\item \textbf{Feature Selection:}
+To enhance the model's performance, a Sequential Feature Selector (SFS) was employed to methodically identify the most impactful features. This process resulted in two new feature sets: the "best" feature list comprising 11 of the 18 total features, and a "small" feature list which achieved comparable accuracy with only 7 out of 10 features. These subsets were chosen based on their ability to optimize the predictive accuracy of the models while minimizing complexity. Subsequent to feature selection, a comparative analysis was conducted using the base model structure with three different sets of features: the original base feature list, the newly identified best feature list, and the small feature list. This comparison was aimed at determining the impact of each feature set on model performance in terms of accuracy and efficiency.
 
+\item \textbf{Parameter Optimization via GridSearchCV:}
+Following the feature comparison, GridSearchCV was implemented to systematically explore and optimize several hyperparameters for each model variant (base, best feature list, and small feature list). Each of the three feature sets was then evaluated using their respective optimized models, as determined by the GridSearchCV results. The effectiveness of each model was assessed based on the optimized feature list and model parameters, focusing on classification accuracy and computational efficiency.
 
-Then we will use gridSearch CV for model selection
+\item \textbf{Feature Importance Analysis:}
+Finally, to understand the contribution of individual features within the optimized models, a permutation feature importance analysis was performed. This method involved systematically altering the values of each feature in the dataset and observing the resultant impact on model performance. This analysis helped to highlight which features were most critical to the model’s predictive capabilities, providing insights into the underlying data structure and the physics phenomena being modeled.
+\end{enumerate}
 
-We start with the base model provided with the project.
+%The methodological approach adopted in this study allowed for a comprehensive evaluation of feature selection techniques, hyperparameter optimization, and the relative importance of individual features, culminating in a robust analysis of neural network models for classifying high-energy physics events.
 
-We can see the various plots generated
 
 
 
 \clearpage
 \section{Results}
 
-Address all project questions and support your findings with appropriate graphs. Present
-clearly defined figures with good layout. Make sure data interpretation is easy to infer
-from figures and tables. Throughout the results, employ good practices of ML such as
-cross-validation and hyperparameter optimization.
+%Address all project questions and support your findings with appropriate graphs. Present
+%clearly defined figures with good layout. Make sure data interpretation is easy to infer
+%from figures and tables. Throughout the results, employ good practices of ML such as
+%cross-validation and hyperparameter optimization.
 
+
+\subsection{Feature Selection}
+
+
+In this subsection, we present our findings from applying Sequential Feature Selection (SFS) to our dataset. SFS, while powerful, is notably computationally intensive as it involves multiple iterations over the feature list. The process begins with a model devoid of any features, progressively incorporating features based on their contribution to performance enhancement. Given our dataset includes 18 features, this amounts to 171 evaluations:
+
+$$18 + 17 + ....  + 1 = \frac{18 \times 19}{2} = 171 $$
+
+Additionally, we employ cross-validation during each evaluation to enhance the robustness of our findings, leading to a total of 
+$171 \times 5 =855$ model fits. To manage the computational demands, we selectively use smaller data subsets—10,000 and 30,000 samples—and execute SFS on these subsets. The implementation details can be found in Appendix \ref{code_feat_selection}. 
+
+The outcomes, are summarized in Figure \ref{fig:SFS_results} and Table \ref{table:SFS_results}. This approach not only elucidates the efficacy of selected features but also helps in optimizing processing time.  Table \ref{table:SFS_results} outlines the features selected during each iteration and their corresponding average CV accuracy, illustrating how each feature contributes to the overall model performance. The results are directly related to plot (b) in Figure \ref{fig:SFS_results}, providing a detailed view of the feature selection impact within this specific subset.
+
+We have opted to advance with three distinct feature lists for our analysis. The first list is the initially suggested base list, the second is the best-performing list as determined by the Sequential Feature Selector (SFS), and the third is the smallest list that maintains at least 80\% accuracy. The latter two lists are highlighted in green in Table \ref{table:SFS_results}. Utilizing the full dataset, we produced plots similar to those in Figure \ref{fig:base_model_plots} using the base NN architecure provided, and our findings are showcased in Figure \ref{fig:base_models}. The relevant code is documented in Appendix \ref{code_feat_comparison}.
 
 
 	\begin{figure}[ht]
 		\centering
 		\begin{subfigure}{\textwidth}
 			\centering
-		\includegraphics[width=.8\linewidth]{feature selection/feature_num_performance_10k.pdf}
+		\includegraphics[width=0.9\linewidth]{feature selection/feature_num_performance_10k.pdf}
 		\caption{10 000 samples}
 		\end{subfigure}
-		\vspace{1cm} % Adds space between the images
 		
 		\begin{subfigure}{\textwidth}
 		\centering
-		\includegraphics[width=.8\linewidth]{feature selection/feature_num_performance_30k.pdf}
+		\includegraphics[width=0.9\linewidth]{feature selection/feature_num_performance_30k.pdf}
 		\caption{30 000 samples}
 		\end{subfigure}
-		\caption{The accuracy performance of Sequential Feature Selector with two subsets of the data.}
+		\caption{Accuracy Performance of the Sequential Feature Selector on Two Data Subsets.}
 		\label{fig:SFS_results}
 	\end{figure}
 	
@@ -172,41 +190,42 @@ cross-validation and hyperparameter optimization.
 		79.84\%                        & \begin{tabular}[c]{@{}l@{}}('jet\_1\_pt', 'jet\_2\_pt', 'jet\_3\_pt', 'jet\_1\_eta', 'jet\_2\_eta',   'jet\_3\_eta', 'jet\_1\_twb', 'jet\_2\_twb',\\ 'jet\_3\_twb', 'bjet\_1\_pt', 'lep\_1\_pt',   'lep\_2\_pt', 'lep\_3\_pt', 'n\_jets', 'n\_bjets', 'n\_leptons', 'met\_met', 'H\_T')\end{tabular} \\ \bottomrule
 	\end{tabular}
 	}
-	\caption{Results of the Secquential Feature Selector. We can gather Feature Importances from these tables. The ones highlighed in green is what we use to continue our analysis}
+	\caption{Iterative Feature Selection and Corresponding Average Cross-Validation Accuracy Scores by Sequential Feature Selector (SFS) for the 30,000 Sample Subset.}
 	\label{table:SFS_results}
 \end{table}
 
 \end{landscape}
 
-
-
-\begin{figure}[ht]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\linewidth]{feature_comparison/feat-comparison.pdf}
-	\caption{Performance plots of all 3 feature lists based on the base model provided}
+	\caption{Performance Comparison of Neural Network Models Using Different Feature Lists. Top panels show loss curves for the base list, SFS best list, and smallest list with over $80\%$ accuracy across training and validation phases over 100 epochs. Middle panels depict corresponding accuracy values. Bottom panels illustrate NN output distributions for training and testing datasets, highlighting model behavior for signal and background classes.}
 	\label{fig:base_models}
 \end{figure}
 
+\clearpage
 
-Model Selection:
+\subsection{Parameter Optimization via GridSearchCV}
 
-\begin{table}[]
+In this subsection, we detail our findings from using GridSearchCV on three feature lists identified previously. The optimization adjusted parameters including the number of nodes in three neural network layers, learning rate, and batch size, with three possible values for each of these five parameters, as shown in Table \ref{table:gridsearchCV_params}. Notably, parameters in Set 2 are those used in the base model. This exhaustive search, involving $3^7 = 2187$ fits due to the parameters, threefold cross-validation, and three feature sets, demanded significant computational resources, leading us to use a smaller dataset of 30,000 samples.
+
+The results are presented in Table \ref{table:best_params_gridsearchCV}, which displays the best parameter configurations and their corresponding performances. Each configuration was evaluated through 3-fold cross-validation, and the 'Best Score' column indicates the average accuracy across the folds, identifying the most effective settings. We then applied these optimal parameters to generate the visualizations in Figure \ref{fig:best_models}, akin to those in Figure \ref{fig:base_models}. Relevant code is available in Appendices \ref{code_model_selection} and \ref{code_best_models}.
+
+\begin{table}[h!]
 	\centering
 	\begin{tabular}{@{}lrrr@{}}
 		\toprule
-		Parameter            & Trial 1 & Trial 2 & Trial 3 \\ \midrule
-		Nodes: Dense Layer 1 & 25      & 50      & 100     \\
-		Nodes: Dense Layer 2 & 12      & 25      & 50      \\
-		Nodes: Dense Layer 3 & 5       & 10      & 15      \\
-		Batch Size           & 100     & 150     & 300     \\
-		Adam Learning Rate   & 0.002   & 0.0002  & 0.00002 \\
-		Best Score           & 82.96\% & 83.39\% & 82.7\%\\
+		Parameter            & Set 1  & Set 2  & Set 3  \\ \midrule
+		Nodes: Dense Layer 1 & 25     & 50     & 100    \\
+		Nodes: Dense Layer 2 & 12     & 25     & 50     \\
+		Nodes: Dense Layer 3 & 5      & 10     & 15     \\
+		Batch Size           & 100    & 150    & 300    \\
+		Adam Learning Rate   & 0.002  & 0.0002 & 0.00002 \\
 		\bottomrule   
 	\end{tabular}
-		\caption{Parameters we will swift through in gridsearchCV.} 
+	\caption{Parameter configurations for GridSearchCV, listing sets of values for nodes in each dense layer, batch sizes, and learning rates. Configuration 2 corresponds to the parameters of the base model.} 
 	\label{table:gridsearchCV_params}
 \end{table}
-
 
 
 
@@ -224,7 +243,7 @@ Model Selection:
 		Best Score           & 82.96\%   & 83.39\%        & 82.7\%  \\
 		\bottomrule                                            
 	\end{tabular}
-	\caption{Best Parameters for the 3 Feature Lists.} 
+	\caption{Optimized Parameter Sets and Corresponding Performance Scores from GridSearchCV for our Three Feature Lists.} 
 	\label{table:best_params_gridsearchCV}
 	
 \end{table}
@@ -232,17 +251,23 @@ Model Selection:
 
 
 
-\begin{figure}[ht]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\linewidth]{best_model/best_models.pdf}
-	\caption{Performance plots of all 3 feature lists based on best parameters found for each.}
+	\caption{Performance Comparison of Optimized Neural Network Models Using Different Feature Lists. This figure displays the outcomes of models individually optimized using GridSearchCV for the base list, the SFS best list, and the smallest list with over 80\% accuracy. The top panels illustrate loss curves for both training and validation phases over 100 epochs. The middle panels show the corresponding accuracy values, and the bottom panels provide NN output distributions for the training and testing datasets, emphasizing the model's differentiation between signal and background classes.}
 	\label{fig:best_models}
 \end{figure}
 
-\begin{figure}[ht]
+\clearpage
+
+\subsection{Feature Importance Analysis}
+
+In this subsection, we present our findings from conducting permutation feature importance analysis on the optimal models developed in the previous subsection. Permutation feature importance evaluates the impact of each feature on the model's performance by randomly shuffling individual feature values and observing the change in model accuracy. This process disrupts the relationship between the feature and the outcome, quantifying the importance of each feature based on the decrease in model performance. Our findings are summarized in Figure \ref{fig:best_models_feature_ranking}. This figure displays the relative importance of features across all three feature lists, highlighting how each feature contributes to model performance when utilizing the best parameters identified for each list.  The relevant code is documented in Appendix \ref{code_best_models}.
+
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\linewidth]{best_model/feature_importances.pdf}
-	\caption{Performance plots of all 3 feature lists based on best parameters found for each.}
+	\caption{Feature Importances for Each Feature List Based on Optimized Model Parameters. }
 	\label{fig:best_models_feature_ranking}
 \end{figure}
 
@@ -250,43 +275,47 @@ Model Selection:
 
 \clearpage
 \section{Discussion and Summary}
-– Discussion and Summary:
-We were not able to improve accuracy significantly, but we we were able to show that we can reduce the dimensionality of our feature space and still maintain similiar accuracy.
+
+In this study, while we did not achieve a significant improvement in accuracy, we successfully demonstrated the ability to reduce the dimensionality of our feature space without compromising accuracy. Notably, our smallest feature list comprising only 7 features performed comparably to the base list of 9 features and the optimal list of 11 features identified by Sequential Feature Selector (SFS).
+
+An interesting observation emerged from the feature importance analysis. Contrary to expectations, the ranking of features in the smallest list did not align perfectly with those in the best list derived from SFS. For example, the feature $\mathrm{jet\_1\_pt}$ was ranked higher in the best list's feature importance despite not being in the top 7 of the SFS selections. Additionally, the base model identified $\mathrm{H\_T}$ as the most crucial feature, a finding SFS did not recognize until the 14th iteration, as shown in Table \ref{table:SFS_results}. This discrepancy suggests that the forward iteration approach of SFS may not have been optimal, and exploring alternative methods such as backward elimination could potentially yield different insights into feature significance.
+
+Although SFS did not fail (provided results comparable to the base model), it also did not furnish a significant enhancement in performance. The grid search over various parameters similarly did not yield a substantial increase in accuracy, with most results hovering around 80\%.
 
 
-
-Provide a concise summary of findings, successes and failures, as well as outlook for the
-study.
-
+This study underscores the complexity of feature selection and the potential limitations of certain algorithms in capturing the most predictive features. Future work could explore more dynamic feature selection methods or hybrid approaches that combine forward and backward elimination to potentially uncover more effective feature combinations. Additionally, experimenting with different model architectures or more advanced machine learning algorithms might also lead to improvements in performance. Overall, the findings suggest a continued exploration into more nuanced aspects of feature selection and model optimization to better understand and enhance predictive accuracies in complex datasets.
 \appendix
 
 \clearpage
 \section{Code: Base Model}
 
-In this section we can find the code associated with the base model provided at the begining of this project. This code was used to generate the plots in Fig. \ref{fig:base_model_plots}
+In this section, we provide the code used to implement the base model introduced at the beginning of this project. This code was used in generating the visualizations displayed in Figure \ref{fig:base_model_plots}.
 
 \includepdf[pages=-]{base_model/base_model.pdf}
 
-\section{Code: Feature Selection}
+\section{Code: Feature Selection}\label{code_feat_selection}
 
-In this section we can find the code associated with using the Sequential Feature Selector. This code was used to generate the plots in Fig. \ref{fig:SFS_results} and Table \ref{table:SFS_results}.
+
+In this section, we present the code utilized for the Sequential Feature Selector. This code facilitated the creation of the plots shown in Figure \ref{fig:SFS_results} and the data compiled in Table \ref{table:SFS_results}.
 
 \includepdf[pages=-]{feature selection/feature_selection.pdf}
 
-\section{Code: Feature Comparison}
+\section{Code: Feature Comparison}\label{code_feat_comparison}
 
-This code was used to generate the plots in Fig. \ref{fig:base_models}
+
+In this section, we present code was utilized to generate the plots in Figure \ref{fig:base_models}, which compare the performance of the base neural network model across the three feature lists.
 
 \includepdf[pages=-]{feature_comparison/feature_comparison.pdf}
 
-\section{Code: Model Selection}
+\section{Code: Parameter Optimization via GridSearchCV}\label{code_model_selection}
 
-In this section we can find the code associated with using gridSearchCV for model selection. This code was used to generate the plots in Tables \ref{table:gridsearchCV_params} and \ref{table:best_params_gridsearchCV}.
+In this section, you will find the code used for applying GridSearchCV to optimize model parameters. This code was instrumental in producing the data shown in Tables \ref{table:gridsearchCV_params} and \ref{table:best_params_gridsearchCV}.
 
 \includepdf[pages=-]{model_selection/model_selection.pdf}
 
-\section{Code: Best Models}
-This code was used to generate the plots in Fig. \ref{fig:best_models} and Fig. \ref{fig:best_models_feature_ranking}
+\section{Code: Best Models Performance and Feature Importance}\label{code_best_models}
+
+In this section, the provided code was used to generate the plots in Figure \ref{fig:best_models}, which compare the performance of individually optimized neural network models across the three feature lists. Additionally, this code facilitated the analysis of permutation feature importance, as displayed in Figure \ref{fig:best_models_feature_ranking}.
 
 \includepdf[pages=-]{best_model/best_models_code.pdf}
 
